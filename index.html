@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Product Feedback</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              background: 'hsl(240, 10%, 99%)',
+              foreground: 'hsl(240, 10%, 3.9%)',
+              border: "hsl(240, 5.9%, 90%)",
+              input: "hsl(240, 5.9%, 90%)",
+              ring: "hsl(211, 100%, 50%)",
+              
+              'system-blue': 'hsl(205, 78%, 24%)',
+              'system-red': 'hsl(0, 100%, 50%)',
+              'system-green': 'hsl(142, 71%, 45%)',
+              'system-yellow': 'hsl(48, 100%, 50%)',
+              'system-orange': 'hsl(25, 95%, 53%)',
+              'system-purple': 'hsl(262, 85%, 58%)',
+
+              primary: {
+                DEFAULT: 'hsl(205, 78%, 24%)',
+                foreground: 'hsl(240, 10%, 99%)',
+              },
+              secondary: {
+                DEFAULT: 'hsl(240, 4.8%, 95.9%)',
+                foreground: 'hsl(240, 5.9%, 10%)',
+              },
+              destructive: {
+                DEFAULT: "hsl(0, 84.2%, 60.2%)",
+                foreground: 'hsl(0, 0%, 98%)',
+              },
+              muted: {
+                DEFAULT: 'hsl(240, 4.8%, 95.9%)',
+                foreground: 'hsl(240, 3.8%, 46.1%)',
+              },
+              accent: {
+                DEFAULT: 'hsl(240, 4.8%, 95.9%)',
+                foreground: 'hsl(240, 5.9%, 10%)',
+              },
+              popover: {
+                DEFAULT: 'hsl(0, 0%, 100%)',
+                foreground: 'hsl(240, 10%, 3.9%)',
+              },
+              card: {
+                DEFAULT: 'hsl(0, 0%, 100%)',
+                foreground: 'hsl(240, 10%, 3.9%)',
+              },
+            },
+            borderRadius: {
+              '3xl': '1.75rem', 
+              '2xl': '1.25rem',
+              xl: '1rem',
+              lg: '0.75rem',
+              md: '0.5rem',
+              sm: '0.25rem',
+            },
+            keyframes: {
+                shake: {
+                  '0%, 100%': { transform: 'translateX(0)' },
+                  '10%, 30%, 50%, 70%, 90%': { transform: 'translateX(-5px)' },
+                  '20%, 40%, 60%, 80%': { transform: 'translateX(5px)' },
+                }
+            },
+            animation: {
+                shake: 'shake 0.5s ease-in-out',
+            }
+          },
+        },
+      }
+    </script>
+    <style>
+      .line-clamp-3 {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 3;
+        overflow: hidden;
+      }
+      .line-clamp-4 {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 4;
+        overflow: hidden;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@19",
+    "react-dom/client": "https://esm.sh/react-dom@19/client",
+    "@supabase/supabase-js": "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body class="bg-gradient-to-br from-[#8e9eab] to-[#eef2f3]">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>

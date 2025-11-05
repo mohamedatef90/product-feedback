@@ -1,0 +1,5 @@
+{
+  "name": "Product Feedback",
+  "description": "A web application to collect detailed user surveys on application features, usability, accessibility, user flow, and UI design. It presents projects in a gallery format and saves visitor feedback.",
+  "requestFramePermissions": []
+}
