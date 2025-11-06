@@ -41,7 +41,9 @@ const getErrorMessage = (error: unknown): string => {
 
 function App() {
   const [session, setSession] = useState<Session | null>(null);
+  // Start with no role so the LoginPage is shown as the start page
   const [userRole, setUserRole] = useState<UserRole>(null);
+  // Default view when logged in will be the gallery
   const [currentView, setCurrentView] = useState<View>('gallery');
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -91,17 +93,21 @@ function App() {
     setLoading(true);
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
+      // If there's an active session, treat the user as admin. If not, leave userRole null
+      // to show the LoginPage as the start page.
       if (session) {
         setUserRole('admin');
       } else {
-        setUserRole('guest'); // Default to guest if no session
+        setUserRole(null);
       }
       setLoading(false);
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
-       setUserRole(session ? 'admin' : 'guest');
+      // When auth state changes, set role to admin when signed in, otherwise to null so
+      // the login screen becomes the start page again.
+      setUserRole(session ? 'admin' : null);
     });
     
     return () => subscription.unsubscribe();
