@@ -1,3 +1,5 @@
+
+
 import React, { useState, useCallback, useEffect } from 'react';
 import { Project, SurveyResponse, SurveyData, SurveyQuestion, ToastMessage } from './types';
 import Header from './components/Header';
@@ -10,6 +12,7 @@ import ToastContainer from './components/Toast';
 import LoginPage from './components/LoginPage';
 import Modal from './components/Modal';
 import Button from './components/Button';
+import LoadingScreen from './components/LoadingScreen';
 import { supabase } from './lib/supabaseClient';
 import type { Session } from '@supabase/supabase-js';
 import { INITIAL_SURVEY_QUESTIONS } from './constants';
@@ -41,16 +44,16 @@ const getErrorMessage = (error: unknown): string => {
 
 function App() {
   const [session, setSession] = useState<Session | null>(null);
-  // Start with no role so the LoginPage is shown as the start page
   const [userRole, setUserRole] = useState<UserRole>(null);
-  // Default view when logged in will be the gallery
   const [currentView, setCurrentView] = useState<View>('gallery');
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [projects, setProjects] = useState<Project[]>([]);
   const [surveyQuestions, setSurveyQuestions] = useState<SurveyQuestion[]>([]);
+  const [surveyResponses, setSurveyResponses] = useState<SurveyResponse[]>([]);
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [isSessionLoading, setIsSessionLoading] = useState(true);
+  const [isDataLoading, setIsDataLoading] = useState(false);
   const [viewingDescription, setViewingDescription] = useState<Project | null>(null);
 
   const addToast = useCallback((message: string, type: ToastMessage['type'] = 'success') => {
@@ -88,26 +91,33 @@ function App() {
         setSurveyQuestions(INITIAL_SURVEY_QUESTIONS); // Fallback on error too
     }
   }, [addToast]);
+
+  const fetchSurveyResponses = useCallback(async () => {
+    try {
+        const { data, error } = await supabase.from('survey_responses').select('*').order('created_at', { ascending: false });
+        if (error) throw error;
+        setSurveyResponses(data as SurveyResponse[]);
+    } catch (error: unknown) {
+        addToast(`Error fetching survey responses: ${getErrorMessage(error)}`, 'error');
+        console.error('Error fetching survey responses:', error);
+    }
+  }, [addToast]);
   
   useEffect(() => {
-    setLoading(true);
+    setIsSessionLoading(true);
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
-      // If there's an active session, treat the user as admin. If not, leave userRole null
-      // to show the LoginPage as the start page.
       if (session) {
         setUserRole('admin');
       } else {
-        setUserRole(null);
+        setUserRole(null); // Force login page if no session
       }
-      setLoading(false);
+      setIsSessionLoading(false);
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
-      // When auth state changes, set role to admin when signed in, otherwise to null so
-      // the login screen becomes the start page again.
-      setUserRole(session ? 'admin' : null);
+       setUserRole(session ? 'admin' : null); // On logout, go back to login page
     });
     
     return () => subscription.unsubscribe();
@@ -115,9 +125,16 @@ function App() {
 
   useEffect(() => {
     if (userRole) { // Fetch data once a role is determined (guest or admin)
-        Promise.all([fetchProjects(), fetchQuestions()]);
+        setIsDataLoading(true);
+        const dataFetches = userRole === 'admin'
+            ? [fetchProjects(), fetchQuestions(), fetchSurveyResponses()]
+            : [fetchProjects(), fetchQuestions()];
+
+        Promise.all(dataFetches).finally(() => {
+            setIsDataLoading(false);
+        });
     }
-  }, [userRole, fetchProjects, fetchQuestions]);
+  }, [userRole, fetchProjects, fetchQuestions, fetchSurveyResponses]);
 
   const handleAdminLogin = () => setUserRole('admin');
   const handleGuestLogin = () => setUserRole('guest');
@@ -127,6 +144,7 @@ function App() {
     setCurrentView('gallery');
     setProjects([]); // Clear data on logout
     setSurveyQuestions([]);
+    setSurveyResponses([]);
   };
 
   const handleSelectProject = useCallback((project: Project) => {
@@ -145,11 +163,15 @@ function App() {
         const { error } = await supabase.from('survey_responses').insert([submissionData]);
         if (error) throw error;
         setCurrentView('thankyou');
+        // Refetch responses if admin is logged in
+        if (userRole === 'admin') {
+            fetchSurveyResponses();
+        }
     } catch (error: unknown) {
         addToast(`Failed to submit feedback: ${getErrorMessage(error)}`, 'error');
         console.error('Error submitting survey:', error);
     }
-  }, [addToast]);
+  }, [addToast, userRole, fetchSurveyResponses]);
 
   const handleReturnToGallery = useCallback(() => {
     setSelectedProject(null);
@@ -293,6 +315,7 @@ function App() {
                     onAddQuestion={handleAddQuestion}
                     onUpdateQuestion={handleUpdateQuestion}
                     onDeleteQuestion={handleDeleteQuestion}
+                    surveyResponses={surveyResponses}
                 />;
       case 'gallery':
       default:
@@ -301,6 +324,9 @@ function App() {
         );
         return (
             <div>
+                 <h2 className="text-3xl md:text-4xl font-bold text-foreground text-center mb-8 tracking-tight">
+                    Applications Gallery
+                 </h2>
                  <div className="mb-12 max-w-xl mx-auto">
                     <label htmlFor="search-projects" className="sr-only">Search Projects</label>
                     <div className="relative">
@@ -338,10 +364,10 @@ function App() {
     }
   };
 
-  if (loading) {
+  if (isSessionLoading) {
     return (
         <div className="flex items-center justify-center min-h-screen">
-             <p className="text-xl text-foreground">Loading...</p>
+             <p className="text-xl text-foreground">Checking session...</p>
         </div>
     );
   }
@@ -350,8 +376,13 @@ function App() {
     return <LoginPage onAdminLogin={handleAdminLogin} onGuestLogin={handleGuestLogin} />;
   }
 
+  if (isDataLoading) {
+    return <LoadingScreen />;
+  }
+
   return (
-    <div className="min-h-screen text-foreground">
+    <div className="min-h-screen text-foreground relative z-0">
+      <div className="fixed inset-0 bg-background/60 backdrop-blur-md -z-10" />
       <ToastContainer toasts={toasts} onDismiss={removeToast} />
       <Header onNavigate={handleNavigate} userRole={userRole} onLogout={handleLogout} />
       <main className="container mx-auto px-4 py-8 md:py-16">

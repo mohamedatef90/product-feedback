@@ -1,9 +1,11 @@
+
 import React, { useState } from 'react';
-import { Project, SurveyQuestion } from '../types';
+import { Project, SurveyQuestion, SurveyResponse } from '../types';
 import Button from './Button';
 import Modal from './Modal';
 import ProjectForm from './ProjectForm';
 import FormBuilder from './FormBuilder';
+import SurveyResults from './SurveyResults';
 
 interface AdminPageProps {
   projects: Project[];
@@ -14,6 +16,7 @@ interface AdminPageProps {
   onAddQuestion: (questionData: Omit<SurveyQuestion, 'id' | 'created_at'>) => void;
   onUpdateQuestion: (question: SurveyQuestion) => void;
   onDeleteQuestion: (questionId: string) => void;
+  surveyResponses: SurveyResponse[];
 }
 
 const PlusIcon: React.FC<{ className?: string }> = ({ className }) => (
@@ -24,9 +27,10 @@ const PlusIcon: React.FC<{ className?: string }> = ({ className }) => (
 
 const AdminPage: React.FC<AdminPageProps> = ({ 
     projects, onAddProject, onUpdateProject, onDeleteProject,
-    surveyQuestions, onAddQuestion, onUpdateQuestion, onDeleteQuestion 
+    surveyQuestions, onAddQuestion, onUpdateQuestion, onDeleteQuestion,
+    surveyResponses
 }) => {
-  const [activeTab, setActiveTab] = useState<'projects' | 'survey'>('projects');
+  const [activeTab, setActiveTab] = useState<'projects' | 'survey' | 'results'>('projects');
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [projectToDelete, setProjectToDelete] = useState<Project | null>(null);
@@ -92,6 +96,13 @@ const AdminPage: React.FC<AdminPageProps> = ({
           >
             Manage Survey Form
           </button>
+           <button
+            onClick={() => setActiveTab('results')}
+            className={`whitespace-nowrap pb-4 px-1 border-b-2 text-base transition-colors focus:outline-none ${activeTab === 'results' ? 'border-system-blue text-system-blue font-semibold' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
+            aria-current={activeTab === 'results' ? 'page' : undefined}
+          >
+            Survey Results
+          </button>
         </nav>
       </div>
 
@@ -128,6 +139,14 @@ const AdminPage: React.FC<AdminPageProps> = ({
             onAddQuestion={onAddQuestion}
             onUpdateQuestion={onUpdateQuestion}
             onDeleteQuestion={onDeleteQuestion}
+        />
+      )}
+
+      {activeTab === 'results' && (
+        <SurveyResults
+          responses={surveyResponses}
+          projects={projects}
+          questions={surveyQuestions}
         />
       )}
       

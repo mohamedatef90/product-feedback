@@ -13,11 +13,7 @@ const Header: React.FC<HeaderProps> = ({ onNavigate, userRole, onLogout }) => {
     <header className="bg-background/60 backdrop-blur-2xl border-b border-white/20 sticky top-0 z-40 shadow-xl">
       <div className="container mx-auto px-4 py-5 flex justify-between items-center">
         <div className="flex items-center gap-4">
-            <img 
-                src="https://i.postimg.cc/zvWqhmB3/7c03777d88ee2dffef97e812961c7b3d.png" 
-                alt="App Logo" 
-                className="h-14 w-14 rounded-full object-cover " 
-            />
+            <img src="https://i.postimg.cc/zvWqhmB3/7c03777d88ee2dffef97e812961c7b3d.png" alt="Product Feedback Logo" className="h-14 w-14 rounded-2xl flex-shrink-0" />
             <div>
                 <h1 
                     className="text-3xl md:text-4xl font-bold text-foreground tracking-tight cursor-pointer"

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 
 interface StarIconProps {
@@ -20,10 +21,11 @@ const StarIcon: React.FC<StarIconProps> = ({ filled, className }) => (
 
 interface RatingInputProps {
   rating: number;
-  onRatingChange: (rating: number) => void;
+  onRatingChange?: (rating: number) => void;
+  readOnly?: boolean;
 }
 
-const RatingInput: React.FC<RatingInputProps> = ({ rating, onRatingChange }) => {
+const RatingInput: React.FC<RatingInputProps> = ({ rating, onRatingChange, readOnly = false }) => {
   const [hoverRating, setHoverRating] = useState(0);
 
   return (
@@ -32,10 +34,11 @@ const RatingInput: React.FC<RatingInputProps> = ({ rating, onRatingChange }) => 
         <button
           key={star}
           type="button"
-          onMouseEnter={() => setHoverRating(star)}
-          onMouseLeave={() => setHoverRating(0)}
-          onClick={() => onRatingChange(star)}
-          className="cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded"
+          onMouseEnter={!readOnly ? () => setHoverRating(star) : undefined}
+          onMouseLeave={!readOnly ? () => setHoverRating(0) : undefined}
+          onClick={!readOnly && onRatingChange ? () => onRatingChange(star) : undefined}
+          disabled={readOnly}
+          className={`focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded ${readOnly ? 'cursor-default' : 'cursor-pointer'}`}
         >
           <StarIcon
             filled={star <= (hoverRating || rating)}
