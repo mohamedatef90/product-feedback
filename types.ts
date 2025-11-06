@@ -1,13 +1,17 @@
+
 export type SurveyData = {
   visitorName: string;
   visitorDepartment: string;
   answers: Record<string, string | number | null>; // key is question id
 };
 
-export type SurveyResponse = SurveyData & {
+export type SurveyResponse = {
   id: string; // UUID
   project_id: string; // UUID
   created_at: string;
+  visitor_name: string;
+  visitor_department: string;
+  answers: Record<string, string | number | null>;
 };
 
 export type Project = {
