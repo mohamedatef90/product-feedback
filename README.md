@@ -1,20 +1,47 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Product Feedback
 
-# Run and deploy your AI Studio app
+A product-feedback prototype for collecting structured feedback across multiple applications and giving product teams one place to review and manage the results.
 
-This contains everything you need to run your app locally.
+**Live demo:** https://product-feedback-green.vercel.app
 
-View your app in AI Studio: https://ai.studio/apps/drive/1MXNDgnLadKKFgTPC-3yzjGa3wYmdHG04
+## What it demonstrates
 
-## Run Locally
+- Searchable application gallery
+- Per-project feedback surveys
+- Rating, text, and long-form question types
+- Guest feedback flow and confirmation experience
+- Supabase authentication and persistence
+- Admin views for projects, survey questions, and responses
+- Project and question CRUD workflows
+- Responsive React interface with loading, modal, and toast states
 
-**Prerequisites:**  Node.js
+## Product intent
 
+The prototype explores a lightweight feedback-operations workflow: users choose the product they want to comment on, submit contextual feedback, and product teams review the responses from a shared administration experience.
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## Tech stack
+
+- React 19
+- TypeScript
+- Vite
+- Supabase Auth and Database
+
+## Run locally
+
+```bash
+npm install
+npm run dev
+```
+
+A Supabase project is required for authentication and persisted project, survey, and response data. Use environment-managed client configuration before deploying your own instance; never expose a Supabase service-role key in frontend code.
+
+## Build
+
+```bash
+npm run build
+npm run preview
+```
+
+## Status
+
+Product prototype. Before production use, add automated tests, role-based authorization policies, environment-based Supabase configuration, analytics, and a documented database migration path.
